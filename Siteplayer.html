@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immersive Web Viewer</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Main Body Styling */
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e1e2d, #313150);
+            color: #f0f0f0;
+        }
+
+        /* Container */
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        /* Input field and button */
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #2c2c2c;
+            color: #f0f0f0;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #5DADE2;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #3498DB;
+        }
+
+        /* Fullscreen iframe */
+        #iframeContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            background: #121212;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Error message */
+        #errorMessage {
+            color: #ff6b6b;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Small arrow-style back button */
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 24px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #5DADE2;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Immersive Web Viewer</h1>
+        <input type="text" id="urlInput" placeholder="Enter any URL (e.g., YouTube, news site)">
+        <button onclick="openURL()">Open</button>
+        <p id="errorMessage">Unable to load the content. The URL may restrict embedding.</p>
+    </div>
+
+    <!-- Fullscreen iframe container -->
+    <div id="iframeContainer">
+        <button class="back-button" onclick="closeIframe()">&#8592;</button>
+        <iframe id="iframe" sandbox="allow-same-origin allow-scripts allow-popups"></iframe>
+    </div>
+
+    <script>
+        function openURL() {
+            const urlInput = document.getElementById('urlInput').value;
+            const iframe = document.getElementById('iframe');
+            const iframeContainer = document.getElementById('iframeContainer');
+            const errorMessage = document.getElementById('errorMessage');
+            const container = document.querySelector('.container');
+            
+            // Clear any previous error
+            errorMessage.style.display = 'none';
+
+            // Check if the URL starts with http/https
+            let url;
+            if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
+                url = 'https://' + urlInput;
+            } else {
+                url = urlInput;
+            }
+
+            try {
+                // Set the iframe source
+                iframe.src = url;
+                iframeContainer.style.display = 'block';
+                container.style.opacity = '0';
+                setTimeout(() => {
+                    container.style.display = 'none';
+                }, 300);
+                
+                // Display the back button
+                document.querySelector('.back-button').style.display = 'flex';
+            } catch (e) {
+                // Display error message if the URL cannot be loaded
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function closeIframe() {
+            const iframeContainer = document.getElementById('iframeContainer');
+            const iframe = document.getElementById('iframe');
+            const container = document.querySelector('.container');
+            
+            // Clear iframe source to stop any playing media
+            iframe.src = '';
+            iframeContainer.style.display = 'none';
+            container.style.display = 'block';
+            setTimeout(() => {
+                container.style.opacity = '1';
+            }, 100);
+            
+            // Hide the back button
+            document.querySelector('.back-button').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
