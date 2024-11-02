@@ -134,35 +134,52 @@
     </div>
 
     <script>
+        // Load the URL from sessionStorage if it exists
+        window.onload = function() {
+            const savedURL = sessionStorage.getItem('currentURL');
+            if (savedURL) {
+                document.getElementById('urlInput').value = savedURL;
+                openURL(savedURL);
+            }
+        }
+
         function openURL() {
-            const urlInput = document.getElementById('urlInput').value;
+            const urlField = document.getElementById('urlInput');
+            const url = urlField.value;
             const iframe = document.getElementById('iframe');
             const iframeContainer = document.getElementById('iframeContainer');
             const errorMessage = document.getElementById('errorMessage');
             const container = document.querySelector('.container');
-            
+
             // Clear any previous error
             errorMessage.style.display = 'none';
 
             // Check if the URL starts with http/https
-            let url;
-            if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
-                url = 'https://' + urlInput;
+            let formattedURL;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                formattedURL = 'https://' + url;
             } else {
-                url = urlInput;
+                formattedURL = url;
+            }
+
+            // Check if the URL is a YouTube link
+            if (formattedURL.includes('youtube.com') || formattedURL.includes('youtu.be')) {
+                // Redirect to YouTube player
+                window.open(formattedURL, '_blank');
+                return; // Exit the function to prevent iframe loading
             }
 
             try {
                 // Set the iframe source
-                iframe.src = url;
+                iframe.src = formattedURL;
                 iframeContainer.style.display = 'block';
                 container.style.opacity = '0';
                 setTimeout(() => {
                     container.style.display = 'none';
                 }, 300);
                 
-                // Display the back button
-                document.querySelector('.back-button').style.display = 'flex';
+                // Save the URL in sessionStorage
+                sessionStorage.setItem('currentURL', formattedURL);
             } catch (e) {
                 // Display error message if the URL cannot be loaded
                 errorMessage.style.display = 'block';
